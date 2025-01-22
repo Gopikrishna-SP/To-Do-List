@@ -1,0 +1,444 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Header from '../component/Header';
+// import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { Box, Typography, Card, CardActionArea, IconButton } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import background from '../asset/background.jpeg';
+import AttendancePercentage from '../component/AttendancePercentage';
+import UpcomingBirthdays from '../component/UpcomingBirthdays';
+import LeaveSummary from '../component/LeaveSummary';
+import Announcement from '../component/Annoucement';
+import CustomCalendar from '../component/CustomCalendar';
+import EmployeeStatistics from '../component/EmployeeStatistics';
+import TaskManager from '../component/TaskManager';
+
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import Sidebar from '../component/Sidebar';
+import Logo from '../component/Logo';
+
+const cardImages = [
+  'https://cdn-icons-png.flaticon.com/128/9131/9131529.png',
+  'https://cdn-icons-png.flaticon.com/128/3589/3589030.png',
+  'https://cdn-icons-png.flaticon.com/128/16446/16446183.png',
+  'https://cdn-icons-png.flaticon.com/128/781/781835.png',
+  'https://cdn-icons-png.flaticon.com/128/8916/8916557.png',  
+  'https://cdn-icons-png.flaticon.com/128/10857/10857085.png',
+  'https://cdn-icons-png.flaticon.com/128/8632/8632743.png',
+  'https://cdn-icons-png.flaticon.com/128/7653/7653930.png',
+];
+
+function Dashboard() {
+  const navigate = useNavigate();
+  const [employee, setEmployee] = useState(null);
+  const [role, setRole] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  useEffect(() => {
+    // Get user ID, JWT token, and role from cookies
+    const userId = Cookies.get("userId");
+    const jwtToken = Cookies.get("jwtToken");
+    const userRole = JSON.parse(Cookies.get("userRoles") || "[]");
+
+    console.log("User ID:", userId);
+    console.log("JWT Token:", jwtToken);
+    console.log("User Role:", userRole);
+
+    setRole(userRole);
+
+    if (userId && jwtToken) {
+      axios
+        .get(`http://localhost:8080/api/v1/user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        })
+        .then((response) => {
+          const data = response.data.data; // Extract the 'data' object from response
+          console.log("Employee Data:", data);
+          setEmployee(data); // Set employee data for rendering
+        })
+        .catch((error) => {
+          console.error("Error fetching data: ", error);
+        });
+    } else {
+      console.log("User ID or JWT Token is missing");
+    }
+  }, []);
+
+  // Safe destructuring with optional chaining
+  const firstName = employee?.personalDetails?.[0]?.firstName || 'Guest';
+  const middleName = employee?.personalDetails?.[0]?.middleName || '';
+  const lastName = employee?.personalDetails?.[0]?.lastName || '';
+
+  const handleCardClick = (cardId) => {
+    navigate(`/card/${cardId}`);
+  };
+
+  console.log("Role:", role);
+  const handleClickOpen = () => {
+    setOpenForm(true);
+  };
+
+  const handleClose = () => {
+    setOpenForm(false);
+  };
+
+
+    const [openForm, setOpenForm] = useState(false);
+  
+  return (
+    <Box sx={{ display: 'flex', height: '100vh' }}>
+      <Box sx={{ width: '250px', position: 'fixed', height: '100vh' }}>
+        <Sidebar open={sidebarOpen} toggleSidebar={toggleSidebar} />
+      </Box>
+      <Box sx={{ flexGrow: 1, marginLeft: sidebarOpen ? '250px' : '0', backgroundColor: '#f3f4f6' }}>
+        <Box>
+          
+        <Box display="flex" flexDirection="row" alignItems="center">
+          {/* MenuIcon - Toggles Drawer */}
+          {/*2*/}
+          <Box >
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={toggleSidebar}
+            sx={{ marginRight: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+
+          <Typography
+            variant="h5"
+            component="div"
+            fontWeight="bold"
+            fontSize={{
+              xs: '2vh',
+              sm: '3vh',
+              md: '3vh',
+              lg: '3vh',
+              xl: '3vh',
+            }}
+          >
+            HRMS{' '}
+            <Typography
+              variant="h6"
+              component="span"
+              sx={{
+                fontWeight: 'lighter',
+                fontSize: {
+                  xs: '2vh',
+                  sm: '3vh',
+                  md: '3vh',
+                  lg: '3vh',
+                  xl: '3vh',
+                },
+              }}
+            >
+              Dashboard
+            </Typography>
+          </Typography>
+</Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {/* Logo */}
+          <Box sx={{ paddingRight: '15px', display: { xs: 'none', sm: 'none', md: 'block' } }}>
+            <Logo />
+          </Box>
+
+          {/* Profile Icon - Opens Dialog */}
+          <Box
+            component="img"
+            src="https://cdn-icons-png.flaticon.com/128/2997/2997300.png"
+            alt="profile-icon"
+            sx={{
+              height: { xs: '20px', lg: '25px' },
+              width: { xs: '20px', lg: '25px' },
+              cursor: 'pointer',
+              paddingRight: '15px',
+            }}
+            onClick={handleClickOpen}
+          />
+        </Box>
+        </Box>
+
+        
+        </Box>
+
+        <Box
+          sx={{
+            height: { xs: '130px', sm: '200px', md: '300px', lg: '350px', xl: '350px' },
+            width: '100%',
+            background: `url(${background}) no-repeat center center`,
+            backgroundSize: 'cover',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center', // Centers items vertically
+            justifyContent: 'center', // Centers items horizontally
+          }}
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: '#21367f',
+              opacity: 0.7,
+              zIndex: 1,
+            }}
+          />
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row', // Align content vertically
+              alignItems: 'center', // Center child elements horizontally
+              gap: 3, // Adds spacing between components
+              zIndex: 2,
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: 'Roboto',
+                color: 'white',
+                fontSize: { xs: '2vh', sm: '3vh', md: '4vh', lg: '5vh', xl: '5vh' },
+                fontStyle: 'normal',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)',
+                // textAlign: 'center', // Centers text content
+              }}
+            >
+              Welcome,
+              <Typography
+                component="span"
+                sx={{
+                  color: 'white',
+                  display: 'block',
+                  fontSize: { xs: '3vh', sm: '5vh', md: '4vh', lg: '6vh', xl: '6vh' },
+                  fontStyle: 'normal',
+                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)',
+                  marginTop: '5px',
+                  marginRight: '100px',
+                }}
+              >
+                {`${firstName} ${middleName} ${lastName}`}
+              </Typography>
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row', // Align AttendancePercentage and LeaveSummary horizontally
+                justifyContent: 'center', // Centers the two components
+                gap: 3, // Space between the components
+              }}
+            >
+              <AttendancePercentage />
+              <LeaveSummary />
+            </Box>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'relative',
+            top: { xs: '10px', sm: '15px', md: '30px', lg: '30px', xl: '30px' },
+            zIndex: 3,
+            flexWrap: 'nowrap',
+            backgroundColor: '#f3f4f6',
+            paddingBottom: { md: 6, lg: 6, xl: 6 },
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: { xs: '5px', lg: '20px' },
+              width: { xs: '70%', sm: '70%', md: '100%', lg: '100%', xl: '100%' },
+            }}
+          >
+            {['User','Attendance', 'Leave', 'Payroll', 'Performance', 'Talent-Acquisition','Assign-Task','Announcement'].map((label, index) => (
+              <Box key={index} sx={{ textAlign: 'center', display: (role.includes('ROLE_EMPLOYEE') && (label === 'Assign-Task' || label === 'Announcement' || label === 'User')) || (role.includes('ROLE_MANAGER') && (label === 'Payroll' || label === 'Announcement')) || (role.includes('ROLE_HUMANRESOURCE') && label === 'Assign-Task') ? 'none' : 'block' }}>
+                <Card
+                  sx={{
+                    width: { xs: '30px', sm: '80px', md: '90px', lg: '90px', xl: '90px' },
+                    height: { xs: '30px', sm: '80px', md: '90px', lg: '90px', xl: '90px' },
+                    backgroundColor: '#0056b3',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
+                    '&:hover': {
+                      backgroundColor: '#45a049',
+                    },
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CardActionArea onClick={() => handleCardClick(label)}>
+                    <img
+                      src={cardImages[index]}
+                      alt={`Card ${label}`}
+                      style={{
+                        width: '80%',
+                        height: '80%',
+                        objectFit: 'cover',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </CardActionArea>
+                </Card>
+                <Typography
+                  sx={{
+                    fontSize: { xs: '0.8vh', sm: '0.8vh', md: '2vh', lg: '2vh', xl: '2vh' },
+                    color: '#555',
+                    marginTop: '5px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {label}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' }, // Stack vertically on small screens
+            justifyContent: 'space-around',
+            alignItems: 'flex-start',
+            gap: { xs: '10px', md: '20px' },
+            backgroundColor: '#f3f4f6',
+            p: 3,
+          }}
+        >
+          <Box sx={{ width: { xs: '100%', md: '70%' },  }}>
+            <Typography
+              variant="h6"
+              color="text.secondary"
+              sx={{
+                alignSelf: "flex-start", // Align the title to the left
+                fontWeight: "bold",
+                borderLeft: "4px solid #FFC107",
+                padding: "10px",
+              }}
+            >
+              Announcements
+            </Typography>
+            <Box
+              sx={{
+                backgroundColor: '#f3f4f6',
+                borderRadius: 2,
+                maxHeight: '570px', // Set the maximum height
+                overflowY: 'auto',  // Enable vertical scrolling
+                overflowX: 'hidden', // Disable horizontal scrolling
+                '&::-webkit-scrollbar': {
+                  display: 'none', // Hide the scrollbar
+                },
+                '-ms-overflow-style': 'none',  // IE and Edge
+                'scrollbar-width': 'none',  // Firefox
+              }}
+            >
+              <Announcement />
+            </Box>
+          </Box>
+          
+          <Box sx={{
+            display:'flex',
+            flexDirection:'column',
+            width:'40%',
+          }}>
+            <Box
+              sx={{
+                display: { xs: 'none', md: 'flex' },
+                justifyContent: 'center',
+                height:'67%',
+                width: { xs: '100%', md: '100%' },
+                backgroundColor: '#f3f4f6',
+                margin: 0,
+              }}
+            >
+              <CustomCalendar />
+            </Box>
+            <Box sx={{height:'30%'}}>
+              <UpcomingBirthdays/>
+            </Box>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            backgroundColor: '#f3f4f6',
+            gap: '20px',
+            p: 3,
+          }}
+        >
+          <Box
+            sx={{
+              display: { xs: 'none', md: 'flex' },
+              flexDirection: { xs: 'column', md: 'row' },
+              justifyContent: 'space-evenly',
+              width: '100%',
+            }}
+          >
+            <Box
+              sx={{
+                display: { xs: 'none', md: 'flex' },
+                justifyContent: 'center',
+                width: '40%',
+                backgroundColor: '#f3f4f6',
+                margin: 0,
+              }}
+            >
+              <EmployeeStatistics />
+            </Box>
+
+            <Box sx={{ width: { xs: '100%', md: '60%' }, display: (role.includes('ROLE_EMPLOYEE') || role.includes('ROLE_HUMANRESOURCE')) ? 'none' : 'block' }}>
+              <Typography
+                variant="h6"
+                color="text.secondary"
+                sx={{
+                  alignSelf: "flex-start", // Align the title to the left
+                  fontWeight: "bold",
+                  borderLeft: "4px solid #FFC107",
+                  padding: "10px",
+                }}
+              >
+                Assigned Tasks
+              </Typography>
+              <Box
+                sx={{
+                  backgroundColor: '#f3f4f6',
+                  borderRadius: 2,
+                  maxHeight: '570px',
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  '&::-webkit-scrollbar': {
+                    display: 'none',
+                  },
+                }}
+              >
+                <TaskManager />
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+export default Dashboard;
